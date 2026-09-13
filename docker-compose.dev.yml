@@ -1,0 +1,65 @@
+# Docker Compose configuration for Nena na Daktari
+# Development setup with hot-reloading
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: nnd_dev
+      POSTGRES_USER: nnd_user
+      POSTGRES_PASSWORD: nnd_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nnd_user -d nnd_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Backend (Development)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SECRET_KEY=dev-secret-key
+      - DJANGO_DEBUG=True
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,backend
+      - DB_NAME=nnd_dev
+      - DB_USER=nnd_user
+      - DB_PASSWORD=nnd_password
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # React Frontend (Development)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    volumes:
+      - ./frontend/src:/app/src
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

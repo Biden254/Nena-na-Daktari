@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/node",
+      "config": {
+        "installCommand": "npm install",
+        "buildCommand": "npm run build"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "https://nnd-backend.onrender.com/api/$1"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "https://nnd-backend.onrender.com/admin/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ],
+  "env": {
+    "REACT_APP_API_URL": "https://nnd-backend.onrender.com/api"
+  }
+}

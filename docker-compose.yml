@@ -1,0 +1,63 @@
+# Docker Compose configuration for Nena na Daktari
+# Production-like setup
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: nnd_db
+      POSTGRES_USER: nnd_user
+      POSTGRES_PASSWORD: nnd_password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nnd_user -d nnd_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3
+    volumes:
+      - ./backend:/app
+      - static_files:/app/staticfiles
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SECRET_KEY=your-secret-key-here
+      - DJANGO_DEBUG=False
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - DB_NAME=nnd_db
+      - DB_USER=nnd_user
+      - DB_PASSWORD=nnd_password
+      - DB_HOST=db
+      - DB_PORT=5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  static_files:

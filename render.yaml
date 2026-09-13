@@ -1,0 +1,57 @@
+# Render Blueprint for Nena na Daktari Backend
+# This file defines the infrastructure for deployment
+
+services:
+  # Django Backend Service
+  - type: web
+    name: nnd-backend
+    runtime: python
+    region: frankfurt  # Choose closest to Kenya
+    plan: starter
+    buildCommand: |
+      cd backend
+      pip install -r requirements/prod.txt
+      python manage.py collectstatic --noinput
+      python manage.py migrate
+    startCommand: |
+      cd backend
+      gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: false
+      - key: DJANGO_SETTINGS_MODULE
+        value: config.settings.prod
+      - key: DJANGO_ALLOWED_HOSTS
+        sync: false
+      - key: DB_NAME
+        fromDatabase:
+          name: nnd-database
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: nnd-database
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: nnd-database
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: nnd-database
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: nnd-database
+          property: port
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+
+  # PostgreSQL Database
+  - type: pgsql
+    name: nnd-database
+    region: frankfurt
+    plan: starter
+    databaseName: nnd_db
+    ipAllowList: []
