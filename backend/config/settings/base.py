@@ -185,34 +185,15 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-# CORS Configuration
-# In production, set CORS_ALLOWED_ORIGINS to your Vercel URL(s).
-# Example: https://nnd-frontend.vercel.app,https://nnd-frontend-git-branch.vercel.app
+# CORS — origins loaded from CORS_ALLOWED_ORIGINS env var (comma-separated).
+# On Render set: https://nena-na-daktari.vercel.app,https://nena-na-daktari-<hash>.vercel.app
 CORS_ALLOWED_ORIGINS = config(
     "CORS_ALLOWED_ORIGINS",
     default="http://localhost:3000",
     cast=lambda v: [s.strip() for s in v.split(",")],
 )
 
-# Allow Vercel preview deployments (regex-based)
-# Vercel creates URLs like: https://nnd-frontend-<hash>.vercel.app
-CORS_ALLOWED_ORIGIN_REGEXES = [
-    r"^https://nnd-frontend-.*\.vercel\.app$",
-    r"^https://nnd-frontend\.vercel\.app$",
-]
-
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
 
 # Security Settings (overridden in production)
 if not DEBUG:

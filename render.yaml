@@ -34,4 +34,4 @@ services:
 
       # CORS — your Vercel frontend URL (comma-separated if multiple)
       - key: CORS_ALLOWED_ORIGINS
-        value: https://nnd-frontend.vercel.app
+        value: https://nena-na-daktari.vercel.app
