@@ -1,0 +1,128 @@
+/*
+ * Patients page styles
+ */
+
+/* ===== Search ===== */
+.patients-search {
+  position: relative;
+  margin-bottom: var(--space-6);
+  max-width: 480px;
+}
+
+.patients-search-icon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.patients-search .form-input {
+  padding-left: var(--space-8);
+}
+
+/* ===== Patient List ===== */
+.patients-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.patients-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: none;
+  border-bottom: 1px solid var(--color-border-light);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background-color var(--transition-fast);
+}
+
+.patients-card:last-child {
+  border-bottom: none;
+}
+
+.patients-card:hover {
+  background-color: var(--color-bg);
+}
+
+.patients-card-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.patients-card-avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: 50%;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.patients-card-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.patients-card-name {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.patients-card-meta {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.patients-card-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+.patients-card-date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ===== Pagination ===== */
+.patients-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .patients-card {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .patients-card-right {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-1);
+  }
+}

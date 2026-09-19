@@ -1,13 +1,13 @@
 # Render Blueprint for Nena na Daktari Backend
-# This file defines the infrastructure for deployment
+# The PostgreSQL database is created manually on Render.
+# This blueprint defines the web service only.
 
 services:
-  # Django Backend Service
   - type: web
     name: nnd-backend
     runtime: python
-    region: frankfurt  # Choose closest to Kenya
-    plan: starter
+    region: frankfurt
+    plan: free
     buildCommand: |
       cd backend
       pip install -r requirements/prod.txt
@@ -17,41 +17,21 @@ services:
       cd backend
       gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
-      - key: DJANGO_SECRET_KEY
-        generateValue: true
-      - key: DJANGO_DEBUG
-        value: false
+      # Django core
       - key: DJANGO_SETTINGS_MODULE
         value: config.settings.prod
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
       - key: DJANGO_ALLOWED_HOSTS
-        sync: false
-      - key: DB_NAME
-        fromDatabase:
-          name: nnd-database
-          property: database
-      - key: DB_USER
-        fromDatabase:
-          name: nnd-database
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: nnd-database
-          property: password
-      - key: DB_HOST
-        fromDatabase:
-          name: nnd-database
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: nnd-database
-          property: port
-      - key: CORS_ALLOWED_ORIGINS
+        value: nnd-backend.onrender.com
+      - key: DJANGO_DEBUG
+        value: false
+
+      # Database — paste your Render PostgreSQL Internal Database URL here
+      # Go to your database page → Connections → Internal Database URL
+      - key: DATABASE_URL
         sync: false
 
-  # PostgreSQL Database
-  - type: pgsql
-    name: nnd-database
-    region: frankfurt
-    plan: starter
-    databaseName: nnd_db
-    ipAllowList: []
+      # CORS — your Vercel frontend URL (comma-separated if multiple)
+      - key: CORS_ALLOWED_ORIGINS
+        value: https://nnd-frontend.vercel.app

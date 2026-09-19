@@ -60,11 +60,13 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={styles.form}>
-      {errors.general && <div style={styles.errorBanner}>{errors.general}</div>}
+    <form onSubmit={handleSubmit} className="auth-form">
+      {errors.general && (
+        <div className="alert alert-error">{errors.general}</div>
+      )}
 
-      <div style={styles.fieldGroup}>
-        <label htmlFor="username" style={styles.label}>
+      <div className="form-group">
+        <label htmlFor="username" className="form-label form-label-required">
           Username
         </label>
         <input
@@ -74,18 +76,15 @@ const LoginForm: React.FC = () => {
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Enter your username"
           disabled={isLoading}
-          style={{
-            ...styles.input,
-            ...(errors.username ? styles.inputError : {}),
-          }}
+          className={`form-input ${errors.username ? 'form-input-error' : ''}`}
           autoComplete="username"
           autoFocus
         />
-        {errors.username && <span style={styles.errorText}>{errors.username}</span>}
+        {errors.username && <span className="form-error">{errors.username}</span>}
       </div>
 
-      <div style={styles.fieldGroup}>
-        <label htmlFor="password" style={styles.label}>
+      <div className="form-group">
+        <label htmlFor="password" className="form-label form-label-required">
           Password
         </label>
         <input
@@ -95,85 +94,22 @@ const LoginForm: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
           disabled={isLoading}
-          style={{
-            ...styles.input,
-            ...(errors.password ? styles.inputError : {}),
-          }}
+          className={`form-input ${errors.password ? 'form-input-error' : ''}`}
           autoComplete="current-password"
         />
-        {errors.password && <span style={styles.errorText}>{errors.password}</span>}
+        {errors.password && <span className="form-error">{errors.password}</span>}
       </div>
 
       <button
         type="submit"
         disabled={isLoading}
-        style={{
-          ...styles.button,
-          ...(isLoading ? styles.buttonDisabled : {}),
-        }}
+        className="btn btn-primary btn-lg"
+        style={{ width: '100%', marginTop: 'var(--space-2)' }}
       >
         {isLoading ? 'Signing in...' : 'Sign In'}
       </button>
     </form>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  fieldGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  label: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#374151',
-  },
-  input: {
-    padding: '12px 14px',
-    fontSize: '16px',
-    border: '1px solid #d1d5db',
-    borderRadius: '8px',
-    outline: 'none',
-    transition: 'border-color 0.2s, box-shadow 0.2s',
-    backgroundColor: '#fff',
-  },
-  inputError: {
-    borderColor: '#ef4444',
-  },
-  errorBanner: {
-    padding: '12px 14px',
-    fontSize: '14px',
-    color: '#991b1b',
-    backgroundColor: '#fef2f2',
-    border: '1px solid #fecaca',
-    borderRadius: '8px',
-  },
-  errorText: {
-    fontSize: '13px',
-    color: '#ef4444',
-  },
-  button: {
-    padding: '12px 24px',
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#fff',
-    backgroundColor: '#1976d2',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-    marginTop: '4px',
-  },
-  buttonDisabled: {
-    backgroundColor: '#93c5fd',
-    cursor: 'not-allowed',
-  },
 };
 
 export default LoginForm;

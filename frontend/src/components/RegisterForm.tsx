@@ -32,7 +32,6 @@ const RegisterForm: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Clear field error on change
     if (errors[e.target.name as keyof FormErrors]) {
       setErrors({ ...errors, [e.target.name]: undefined });
     }
@@ -94,7 +93,6 @@ const RegisterForm: React.FC = () => {
     } catch (error: any) {
       const responseErrors = error.response?.data;
       if (responseErrors) {
-        // Map backend field errors to form errors
         const newErrors: FormErrors = {};
         if (responseErrors.username) newErrors.username = Array.isArray(responseErrors.username) ? responseErrors.username[0] : responseErrors.username;
         if (responseErrors.email) newErrors.email = Array.isArray(responseErrors.email) ? responseErrors.email[0] : responseErrors.email;
@@ -115,19 +113,21 @@ const RegisterForm: React.FC = () => {
     }
   };
 
-  const fieldStyle = (fieldName: keyof FormErrors): React.CSSProperties => ({
-    ...styles.input,
-    ...(errors[fieldName] ? styles.inputError : {}),
-  });
+  const fieldClass = (fieldName: keyof FormErrors) =>
+    `form-input ${errors[fieldName] ? 'form-input-error' : ''}`;
 
   return (
-    <form onSubmit={handleSubmit} style={styles.form}>
-      {errors.general && <div style={styles.errorBanner}>{errors.general}</div>}
+    <form onSubmit={handleSubmit} className="auth-form">
+      {errors.general && (
+        <div className="alert alert-error">{errors.general}</div>
+      )}
 
       {/* Name row */}
-      <div style={styles.row}>
-        <div style={styles.halfField}>
-          <label htmlFor="first_name" style={styles.label}>First Name</label>
+      <div className="patient-form-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+        <div className="form-group">
+          <label htmlFor="first_name" className="form-label form-label-required">
+            First name
+          </label>
           <input
             id="first_name"
             name="first_name"
@@ -136,13 +136,15 @@ const RegisterForm: React.FC = () => {
             onChange={handleChange}
             placeholder="First name"
             disabled={isLoading}
-            style={fieldStyle('first_name')}
+            className={fieldClass('first_name')}
             autoComplete="given-name"
           />
-          {errors.first_name && <span style={styles.errorText}>{errors.first_name}</span>}
+          {errors.first_name && <span className="form-error">{errors.first_name}</span>}
         </div>
-        <div style={styles.halfField}>
-          <label htmlFor="last_name" style={styles.label}>Last Name</label>
+        <div className="form-group">
+          <label htmlFor="last_name" className="form-label form-label-required">
+            Last name
+          </label>
           <input
             id="last_name"
             name="last_name"
@@ -151,16 +153,18 @@ const RegisterForm: React.FC = () => {
             onChange={handleChange}
             placeholder="Last name"
             disabled={isLoading}
-            style={fieldStyle('last_name')}
+            className={fieldClass('last_name')}
             autoComplete="family-name"
           />
-          {errors.last_name && <span style={styles.errorText}>{errors.last_name}</span>}
+          {errors.last_name && <span className="form-error">{errors.last_name}</span>}
         </div>
       </div>
 
       {/* Username */}
-      <div style={styles.fieldGroup}>
-        <label htmlFor="username" style={styles.label}>Username</label>
+      <div className="form-group">
+        <label htmlFor="username" className="form-label form-label-required">
+          Username
+        </label>
         <input
           id="username"
           name="username"
@@ -169,16 +173,18 @@ const RegisterForm: React.FC = () => {
           onChange={handleChange}
           placeholder="Choose a username"
           disabled={isLoading}
-          style={fieldStyle('username')}
+          className={fieldClass('username')}
           autoComplete="username"
           autoFocus
         />
-        {errors.username && <span style={styles.errorText}>{errors.username}</span>}
+        {errors.username && <span className="form-error">{errors.username}</span>}
       </div>
 
       {/* Email */}
-      <div style={styles.fieldGroup}>
-        <label htmlFor="email" style={styles.label}>Email</label>
+      <div className="form-group">
+        <label htmlFor="email" className="form-label form-label-required">
+          Email
+        </label>
         <input
           id="email"
           name="email"
@@ -187,15 +193,17 @@ const RegisterForm: React.FC = () => {
           onChange={handleChange}
           placeholder="you@hospital.com"
           disabled={isLoading}
-          style={fieldStyle('email')}
+          className={fieldClass('email')}
           autoComplete="email"
         />
-        {errors.email && <span style={styles.errorText}>{errors.email}</span>}
+        {errors.email && <span className="form-error">{errors.email}</span>}
       </div>
 
       {/* Password */}
-      <div style={styles.fieldGroup}>
-        <label htmlFor="password" style={styles.label}>Password</label>
+      <div className="form-group">
+        <label htmlFor="password" className="form-label form-label-required">
+          Password
+        </label>
         <input
           id="password"
           name="password"
@@ -204,15 +212,17 @@ const RegisterForm: React.FC = () => {
           onChange={handleChange}
           placeholder="At least 8 characters"
           disabled={isLoading}
-          style={fieldStyle('password')}
+          className={fieldClass('password')}
           autoComplete="new-password"
         />
-        {errors.password && <span style={styles.errorText}>{errors.password}</span>}
+        {errors.password && <span className="form-error">{errors.password}</span>}
       </div>
 
       {/* Confirm Password */}
-      <div style={styles.fieldGroup}>
-        <label htmlFor="password_confirm" style={styles.label}>Confirm Password</label>
+      <div className="form-group">
+        <label htmlFor="password_confirm" className="form-label form-label-required">
+          Confirm password
+        </label>
         <input
           id="password_confirm"
           name="password_confirm"
@@ -221,92 +231,22 @@ const RegisterForm: React.FC = () => {
           onChange={handleChange}
           placeholder="Re-enter your password"
           disabled={isLoading}
-          style={fieldStyle('password_confirm')}
+          className={fieldClass('password_confirm')}
           autoComplete="new-password"
         />
-        {errors.password_confirm && <span style={styles.errorText}>{errors.password_confirm}</span>}
+        {errors.password_confirm && <span className="form-error">{errors.password_confirm}</span>}
       </div>
 
       <button
         type="submit"
         disabled={isLoading}
-        style={{
-          ...styles.button,
-          ...(isLoading ? styles.buttonDisabled : {}),
-        }}
+        className="btn btn-primary btn-lg"
+        style={{ width: '100%', marginTop: 'var(--space-2)' }}
       >
         {isLoading ? 'Creating account...' : 'Create Account'}
       </button>
     </form>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '18px',
-  },
-  row: {
-    display: 'flex',
-    gap: '12px',
-  },
-  halfField: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  fieldGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
-  label: {
-    fontSize: '14px',
-    fontWeight: 500,
-    color: '#374151',
-  },
-  input: {
-    padding: '12px 14px',
-    fontSize: '16px',
-    border: '1px solid #d1d5db',
-    borderRadius: '8px',
-    outline: 'none',
-    transition: 'border-color 0.2s, box-shadow 0.2s',
-    backgroundColor: '#fff',
-  },
-  inputError: {
-    borderColor: '#ef4444',
-  },
-  errorBanner: {
-    padding: '12px 14px',
-    fontSize: '14px',
-    color: '#991b1b',
-    backgroundColor: '#fef2f2',
-    border: '1px solid #fecaca',
-    borderRadius: '8px',
-  },
-  errorText: {
-    fontSize: '13px',
-    color: '#ef4444',
-  },
-  button: {
-    padding: '12px 24px',
-    fontSize: '16px',
-    fontWeight: 600,
-    color: '#fff',
-    backgroundColor: '#1976d2',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    transition: 'background-color 0.2s',
-    marginTop: '4px',
-  },
-  buttonDisabled: {
-    backgroundColor: '#93c5fd',
-    cursor: 'not-allowed',
-  },
 };
 
 export default RegisterForm;

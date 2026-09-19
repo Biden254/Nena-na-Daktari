@@ -38,6 +38,16 @@ class EncounterViewSet(viewsets.ModelViewSet):
             return EncounterCreateSerializer
         return EncounterSerializer
 
+    def create(self, request, *args, **kwargs):
+        """Create an encounter and return the full serialized representation."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        # Return the full EncounterSerializer (with id, patient_name, etc.)
+        instance = serializer.instance
+        output_serializer = EncounterSerializer(instance, context={"request": request})
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+
     def perform_create(self, serializer):
         """Set the doctor field to the current user."""
         serializer.save(doctor=self.request.user)

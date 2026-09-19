@@ -7,12 +7,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import authService from './services/authService';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-
-// Placeholder page components
-const DashboardPage = () => <div>Dashboard Page</div>;
-const PatientsPage = () => <div>Patients Page</div>;
-const PatientDetailPage = () => <div>Patient Detail Page</div>;
-const EncounterPage = () => <div>Encounter Page</div>;
+import DashboardPage from './pages/DashboardPage';
+import PatientsPage from './pages/PatientsPage';
+import CreatePatientPage from './pages/CreatePatientPage';
+import PatientDetailPage from './pages/PatientDetailPage';
+import EncounterPage from './pages/EncounterPage';
+import ConsultationsPage from './pages/ConsultationsPage';
 
 /**
  * Protected Route wrapper.
@@ -54,6 +54,14 @@ const App: React.FC = () => {
             }
           />
           <Route
+            path="/patients/new"
+            element={
+              <ProtectedRoute>
+                <CreatePatientPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/patients/:id"
             element={
               <ProtectedRoute>
@@ -66,6 +74,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <EncounterPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/consultations"
+            element={
+              <ProtectedRoute>
+                <ConsultationsPage />
               </ProtectedRoute>
             }
           />

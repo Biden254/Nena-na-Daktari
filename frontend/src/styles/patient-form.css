@@ -1,0 +1,24 @@
+/*
+ * Patient form styles
+ */
+
+.patient-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+}
+
+.patient-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+  margin-top: var(--space-6);
+  border-top: 1px solid var(--color-border-light);
+}
+
+@media (max-width: 600px) {
+  .patient-form-grid {
+    grid-template-columns: 1fr;
+  }
+}

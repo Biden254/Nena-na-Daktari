@@ -1,0 +1,127 @@
+/*
+ * Patient detail page styles
+ */
+
+/* ===== Patient Header ===== */
+.patient-detail-header-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.patient-detail-avatar {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  border-radius: 50%;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.patient-detail-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.patient-detail-name {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
+}
+
+.patient-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.patient-detail-actions {
+  flex-shrink: 0;
+}
+
+/* ===== Encounter History ===== */
+.encounter-history-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-top: var(--space-4);
+}
+
+.encounter-history-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: none;
+  border-bottom: 1px solid var(--color-border-light);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background-color var(--transition-fast);
+}
+
+.encounter-history-card:last-child {
+  border-bottom: none;
+}
+
+.encounter-history-card:hover {
+  background-color: var(--color-bg);
+}
+
+.encounter-history-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.encounter-history-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.encounter-history-id {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  font-family: monospace;
+}
+
+.encounter-history-dates {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 600px) {
+  .patient-detail-header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .patient-detail-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: var(--font-size-md);
+  }
+
+  .patient-detail-actions {
+    width: 100%;
+  }
+
+  .patient-detail-actions .btn {
+    width: 100%;
+  }
+}

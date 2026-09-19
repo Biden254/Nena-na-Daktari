@@ -5,8 +5,10 @@
 
 import React from 'react';
 import { Link, Navigate } from 'react-router-dom';
+import { Stethoscope } from 'lucide-react';
 import RegisterForm from '../components/RegisterForm';
 import authService from '../services/authService';
+import '../styles/auth.css';
 
 const RegisterPage: React.FC = () => {
   // Redirect to dashboard if already authenticated
@@ -15,80 +17,30 @@ const RegisterPage: React.FC = () => {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
+    <div className="auth-container">
+      <div className="auth-card">
         {/* Logo / Branding */}
-        <div style={styles.header}>
-          <div style={styles.logo}>🏥</div>
-          <h1 style={styles.title}>Nena na Daktari</h1>
-          <p style={styles.subtitle}>Create your doctor account</p>
+        <div className="auth-header">
+          <div className="auth-logo">
+            <Stethoscope size={28} strokeWidth={1.8} />
+          </div>
+          <h1 className="auth-title">Nena na Daktari</h1>
+          <p className="auth-subtitle">Create your doctor account</p>
         </div>
 
         {/* Register Form */}
         <RegisterForm />
 
         {/* Login link */}
-        <div style={styles.footer}>
-          <p style={styles.footerText}>
+        <div className="auth-footer">
+          <p className="auth-footer-text">
             Already have an account?{' '}
-            <Link to="/login" style={styles.link}>Sign in</Link>
+            <Link to="/login" className="auth-link">Sign in</Link>
           </p>
         </div>
       </div>
     </div>
   );
-};
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f3f4f6',
-    padding: '20px',
-  },
-  card: {
-    width: '100%',
-    maxWidth: '440px',
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    boxShadow: '0 4px 24px rgba(0, 0, 0, 0.08)',
-    padding: '40px 32px',
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: '28px',
-  },
-  logo: {
-    fontSize: '48px',
-    marginBottom: '12px',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 700,
-    color: '#111827',
-    margin: '0 0 4px 0',
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#6b7280',
-    margin: 0,
-  },
-  footer: {
-    marginTop: '24px',
-    textAlign: 'center',
-  },
-  footerText: {
-    fontSize: '14px',
-    color: '#6b7280',
-    margin: 0,
-  },
-  link: {
-    color: '#1976d2',
-    textDecoration: 'none',
-    fontWeight: 500,
-  },
 };
 
 export default RegisterPage;

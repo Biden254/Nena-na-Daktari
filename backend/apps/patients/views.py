@@ -2,8 +2,9 @@
 Patients views for API operations.
 """
 
-from rest_framework import permissions, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.filters import SearchFilter
+from rest_framework.response import Response
 
 from .models import Patient
 from .serializers import PatientCreateSerializer, PatientListSerializer, PatientSerializer
@@ -34,6 +35,16 @@ class PatientViewSet(viewsets.ModelViewSet):
         elif self.action == "create":
             return PatientCreateSerializer
         return PatientSerializer
+
+    def create(self, request, *args, **kwargs):
+        """Create a patient and return the full serialized representation."""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        # Return the full PatientSerializer (with id, full_name, etc.)
+        instance = serializer.instance
+        output_serializer = PatientSerializer(instance, context={"request": request})
+        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer):
         """Set the created_by field to the current user."""
