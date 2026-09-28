@@ -15,6 +15,7 @@ urlpatterns = [
     path("api/auth/", include("apps.accounts.urls")),
     path("api/", include("apps.patients.urls")),
     path("api/", include("apps.encounters.urls")),
+    path("api/transcription/", include("apps.transcription.urls")),
 ]
 
 # Serve media files in development
