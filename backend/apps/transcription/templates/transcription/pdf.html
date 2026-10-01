@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Consultation Transcript</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        color: #1f2937;
+        margin: 32px;
+      }
+      h1, h2 {
+        margin-bottom: 12px;
+      }
+      .meta {
+        margin-bottom: 24px;
+        line-height: 1.6;
+      }
+      .section {
+        margin-top: 20px;
+      }
+      .transcript {
+        white-space: pre-wrap;
+        line-height: 1.7;
+        border-top: 1px solid #d1d5db;
+        padding-top: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Consultation Transcript</h1>
+    <div class="meta">
+      <div><strong>Consultation ID:</strong> {{ consultation.id }}</div>
+      <div><strong>Patient:</strong> {{ patient.full_name }}</div>
+      <div><strong>Doctor:</strong> {{ doctor.get_full_name|default:doctor.username }}</div>
+      <div><strong>Started:</strong> {{ consultation.started_at }}</div>
+      {% if consultation.ended_at %}
+        <div><strong>Ended:</strong> {{ consultation.ended_at }}</div>
+      {% endif %}
+      <div><strong>Generated:</strong> {{ generated_at }}</div>
+    </div>
+
+    <div class="section">
+      <h2>Transcript</h2>
+      <div class="transcript">{{ transcript.text }}</div>
+    </div>
+  </body>
+</html>

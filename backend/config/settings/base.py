@@ -49,6 +49,7 @@ LOCAL_APPS = [
     "apps.patients",
     "apps.departments",
     "apps.encounters",
+    "apps.transcription",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -185,6 +186,26 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+# Celery / async transcription configuration
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL",
+    default="redis://localhost:6379/0",
+)
+CELERY_RESULT_BACKEND = config(
+    "CELERY_RESULT_BACKEND",
+    default="redis://localhost:6379/0",
+)
+
+# AWS / S3 settings for transcription uploads
+AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
+AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="")
+AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="us-east-1")
+AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL", default="")
+AWS_S3_FILE_OVERWRITE = False
+
+WHISPER_MODEL_SIZE = config("WHISPER_MODEL_SIZE", default="small")
 
 # CORS — origins loaded from CORS_ALLOWED_ORIGINS env var (comma-separated).
 # On Render set: https://nena-na-daktari.vercel.app,https://nena-na-daktari-<hash>.vercel.app
