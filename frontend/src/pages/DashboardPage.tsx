@@ -5,7 +5,7 @@
  * Shows recent patients, recent encounters, and a prominent start consultation action.
  */
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Plus,
@@ -15,20 +15,31 @@ import {
   ArrowRight,
   Clock,
   CalendarDays,
+  Building2,
 } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import patientService from '../services/patientService';
 import encounterService from '../services/encounterService';
-import { Patient, Encounter } from '../types';
+import departmentService from '../services/departmentService';
+import { Department, Patient, Encounter } from '../types';
 import '../styles/dashboard.css';
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [patients, setPatients] = useState<Patient[]>([]);
   const [encounters, setEncounters] = useState<Encounter[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [loadingPatients, setLoadingPatients] = useState(true);
   const [loadingEncounters, setLoadingEncounters] = useState(true);
+  const [loadingDepartments, setLoadingDepartments] = useState(true);
+  const [departmentError, setDepartmentError] = useState<string | null>(null);
+
+  // Server-driven patient search
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Patient[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const searchSeq = useRef(0);
 
   const loadData = useCallback(async () => {
     try {
@@ -50,10 +61,61 @@ const DashboardPage: React.FC = () => {
     loadData();
   }, [loadData]);
 
-  const filteredPatients = patients.filter((p) =>
-    p.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (p.national_id && p.national_id.includes(searchQuery))
-  );
+  // Departments are reference data — loaded independently so a failure
+  // here does not break the rest of the dashboard.
+  useEffect(() => {
+    let mounted = true;
+    departmentService
+      .getDepartments()
+      .then((deps) => {
+        if (mounted) setDepartments(deps);
+      })
+      .catch(() => {
+        if (mounted) setDepartmentError('Could not load departments. Please try again later.');
+      })
+      .finally(() => {
+        if (mounted) setLoadingDepartments(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  // Debounced search against the backend — the patient database is never
+  // downloaded to the browser.
+  useEffect(() => {
+    const term = searchQuery.trim();
+    if (!term) {
+      searchSeq.current += 1;
+      setSearchResults([]);
+      setSearchError(null);
+      setSearching(false);
+      return;
+    }
+
+    setSearching(true);
+    const timer = setTimeout(async () => {
+      const seq = ++searchSeq.current;
+      try {
+        const res = await patientService.getPatients(term);
+        if (seq !== searchSeq.current) return;
+        setSearchResults(res.results);
+        setSearchError(null);
+      } catch {
+        if (seq !== searchSeq.current) return;
+        setSearchResults([]);
+        setSearchError('Search failed. Please try again.');
+      } finally {
+        if (seq === searchSeq.current) setSearching(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  const isSearching = searchQuery.trim().length > 0;
+  const patientList = isSearching ? searchResults : patients;
+  const patientsLoading = isSearching ? searching : loadingPatients;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -120,37 +182,48 @@ const DashboardPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Search */}
+            {/* Search — queries the backend by name or UHI */}
             <div className="dashboard-search">
               <Search size={16} className="dashboard-search-icon" />
               <input
                 type="text"
                 className="form-input"
-                placeholder="Search patients by name or ID..."
+                placeholder="Search patients by name or UHI..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                aria-label="Search patients"
+                aria-label="Search patients by name or UHI"
               />
             </div>
 
             {/* Patient list */}
-            {loadingPatients ? (
+            {patientsLoading ? (
               <div className="loading-state">
                 <div className="spinner" />
-                <span>Loading patients...</span>
+                <span>{isSearching ? 'Searching patients...' : 'Loading patients...'}</span>
               </div>
-            ) : filteredPatients.length === 0 ? (
+            ) : isSearching && searchError ? (
+              <div className="alert alert-error" role="alert">
+                {searchError}
+              </div>
+            ) : patientList.length === 0 ? (
               <div className="empty-state">
                 <UsersRound size={40} className="empty-state-icon" strokeWidth={1.2} />
                 <p className="empty-state-title">
-                  {searchQuery ? 'No patients found' : 'No patients yet'}
+                  {isSearching ? 'No patients found' : 'No patients yet'}
                 </p>
                 <p className="empty-state-description">
-                  {searchQuery
-                    ? 'Try a different search term.'
+                  {isSearching
+                    ? 'No patient matches that name or UHI. You can register them as a new patient.'
                     : 'Create your first patient to begin a consultation.'}
                 </p>
-                {!searchQuery && (
+                {isSearching ? (
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    Clear search
+                  </button>
+                ) : (
                   <button
                     className="btn btn-primary"
                     onClick={() => navigate('/patients/new')}
@@ -162,7 +235,7 @@ const DashboardPage: React.FC = () => {
               </div>
             ) : (
               <div className="dashboard-patient-list">
-                {filteredPatients.map((patient) => (
+                {patientList.map((patient) => (
                   <button
                     key={patient.id}
                     className="dashboard-patient-card"
@@ -179,7 +252,7 @@ const DashboardPage: React.FC = () => {
                         <span className="dashboard-patient-meta">
                           {patient.gender === 'M' ? 'Male' : patient.gender === 'F' ? 'Female' : 'Other'}
                           {patient.date_of_birth && ` · ${formatDate(patient.date_of_birth)}`}
-                          {patient.national_id && ` · ID: ${patient.national_id}`}
+                          {patient.uhi && ` · UHI ${patient.uhi}`}
                         </span>
                       </div>
                     </div>
@@ -251,6 +324,48 @@ const DashboardPage: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Departments — real backend data, ready for encounter association */}
+        <div className="dashboard-section" style={{ marginTop: 'var(--space-8)' }}>
+          <div className="dashboard-section-header">
+            <div className="dashboard-section-title">
+              <Building2 size={18} strokeWidth={1.8} />
+              <h2>Departments</h2>
+            </div>
+          </div>
+
+          {loadingDepartments ? (
+            <div className="loading-state">
+              <div className="spinner" />
+              <span>Loading departments...</span>
+            </div>
+          ) : departmentError ? (
+            <div className="alert alert-error" role="alert">
+              {departmentError}
+            </div>
+          ) : departments.length === 0 ? (
+            <div className="empty-state" style={{ padding: 'var(--space-6)' }}>
+              <p className="empty-state-title">No departments available</p>
+            </div>
+          ) : (
+            <ul className="department-grid">
+              {departments.map((dept) => (
+                <li key={dept.id}>
+                  <button
+                    type="button"
+                    className="department-card department-card-link"
+                    onClick={() => navigate(`/departments/${dept.id}`)}
+                    aria-label={`Open ${dept.name} department`}
+                  >
+                    <Building2 size={18} strokeWidth={1.8} aria-hidden="true" />
+                    <span className="department-card-name">{dept.name}</span>
+                    <ArrowRight size={14} className="text-muted" aria-hidden="true" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </AppShell>

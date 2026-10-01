@@ -13,6 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model - read operations."""
 
     full_name = serializers.SerializerMethodField()
+    departments = serializers.SerializerMethodField()
 
     class Meta:
         model = User
@@ -24,11 +25,19 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "full_name",
             "role",
+            "departments",
         ]
         read_only_fields = ["id"]
 
     def get_full_name(self, obj):
         return obj.get_full_name() or obj.username
+
+    def get_departments(self, obj):
+        """Departments this doctor is assigned to (admin-managed)."""
+        return [
+            {"id": dept.id, "name": dept.name}
+            for dept in obj.departments.all()
+        ]
 
 
 class RegisterSerializer(serializers.ModelSerializer):

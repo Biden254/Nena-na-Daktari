@@ -19,15 +19,17 @@ class PatientSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "full_name",
+            "uhi",
             "date_of_birth",
             "gender",
             "phone",
-            "national_id",
             "created_by",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "created_by", "created_at", "updated_at"]
+        # national_id is intentionally excluded — it is no longer collected
+        # or exposed anywhere in the API.
+        read_only_fields = ["id", "uhi", "created_by", "created_at", "updated_at"]
 
     def get_full_name(self, obj):
         return obj.full_name
@@ -38,13 +40,14 @@ class PatientCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Patient
+        # No national_id — deliberately not collected.
+        # uhi is generated server-side and returned by PatientSerializer.
         fields = [
             "first_name",
             "last_name",
             "date_of_birth",
             "gender",
             "phone",
-            "national_id",
         ]
 
     def create(self, validated_data):
@@ -65,6 +68,7 @@ class PatientListSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "full_name",
+            "uhi",
             "date_of_birth",
             "gender",
             "created_at",

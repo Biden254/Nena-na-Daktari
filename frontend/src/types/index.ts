@@ -11,6 +11,8 @@ export interface User {
   last_name: string;
   full_name: string;
   role: 'doctor' | 'admin';
+  /** Departments this doctor works in (admin-managed). */
+  departments?: Department[];
 }
 
 export interface AuthTokens {
@@ -39,10 +41,11 @@ export interface Patient {
   first_name: string;
   last_name: string;
   full_name: string;
+  /** System-generated Unique Hospital Identifier — read-only. */
+  uhi: string;
   date_of_birth: string;
   gender: 'M' | 'F' | 'O';
   phone: string;
-  national_id: string | null;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -54,7 +57,14 @@ export interface PatientCreateData {
   date_of_birth: string;
   gender: 'M' | 'F' | 'O';
   phone?: string;
-  national_id?: string;
+}
+
+// Department types
+export interface Department {
+  id: string;
+  name: string;
+  /** Present on detail responses: whether the current doctor is assigned. */
+  is_assigned?: boolean;
 }
 
 // Encounter types
@@ -62,8 +72,11 @@ export interface Encounter {
   id: string;
   patient: string;
   patient_name: string;
+  patient_uhi: string;
   doctor: string;
   doctor_name: string;
+  department: string;
+  department_name: string;
   status: 'in_progress' | 'completed' | 'cancelled';
   started_at: string;
   ended_at: string | null;
@@ -74,6 +87,7 @@ export interface Encounter {
 
 export interface EncounterCreateData {
   patient: string;
+  department: string;
   notes?: string;
 }
 

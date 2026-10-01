@@ -4,11 +4,13 @@
  * Form to create a new patient with validation and backend error handling.
  */
 
-import React, { useState, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, FormEvent, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, Save } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import patientService from '../services/patientService';
+import encounterService from '../services/encounterService';
+import departmentService from '../services/departmentService';
 import { PatientCreateData } from '../types';
 
 interface FormErrors {
@@ -17,22 +19,43 @@ interface FormErrors {
   date_of_birth?: string;
   gender?: string;
   phone?: string;
-  national_id?: string;
   non_field?: string;
 }
 
 const CreatePatientPage: React.FC = () => {
   const navigate = useNavigate();
+  // When opened from a department page, the new patient also gets an
+  // initial encounter in that department.
+  const [searchParams] = useSearchParams();
+  const departmentId = searchParams.get('department');
+  const [departmentName, setDepartmentName] = useState<string | null>(null);
   const [formData, setFormData] = useState<PatientCreateData>({
     first_name: '',
     last_name: '',
     date_of_birth: '',
     gender: 'M',
     phone: '',
-    national_id: '',
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
+
+  // Show which department the initial encounter will be created in.
+  useEffect(() => {
+    if (!departmentId) return;
+    let mounted = true;
+    departmentService
+      .getDepartment(departmentId)
+      .then((dept) => {
+        if (mounted) setDepartmentName(dept.name);
+      })
+      .catch(() => {
+        // Invalid department — fall back to plain patient creation.
+        if (mounted) setDepartmentName(null);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [departmentId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -86,17 +109,33 @@ const CreatePatientPage: React.FC = () => {
         gender: formData.gender,
       };
       if (formData.phone?.trim()) payload.phone = formData.phone.trim();
-      if (formData.national_id?.trim()) payload.national_id = formData.national_id.trim();
 
       const patient = await patientService.createPatient(payload);
-      navigate(`/patients/${patient.id}`);
+
+      if (departmentId) {
+        // Create the patient's initial encounter in this department.
+        // The doctor is derived server-side from the authenticated user.
+        try {
+          await encounterService.createEncounter({
+            patient: patient.id,
+            department: departmentId,
+          });
+        } catch {
+          // The patient exists with their UHI either way — landing on
+          // their page lets the staff member start the encounter manually.
+        }
+      }
+
+      // Land on the patient's page with the registration flag so the
+      // generated UHI can be shown to the staff member.
+      navigate(`/patients/${patient.id}`, { state: { created: true } });
     } catch (error: any) {
       if (error.response?.data) {
         const data = error.response.data;
         const newErrors: FormErrors = {};
 
         // Map field errors
-        ['first_name', 'last_name', 'date_of_birth', 'gender', 'phone', 'national_id'].forEach((field) => {
+        ['first_name', 'last_name', 'date_of_birth', 'gender', 'phone'].forEach((field) => {
           if (data[field]) {
             newErrors[field as keyof FormErrors] = Array.isArray(data[field])
               ? data[field][0]
@@ -139,7 +178,11 @@ const CreatePatientPage: React.FC = () => {
               Back
             </button>
             <h1 className="page-title">New patient</h1>
-            <p className="page-subtitle">Enter the patient's basic information</p>
+            <p className="page-subtitle">
+              {departmentName
+                ? `First encounter will be created in ${departmentName}`
+                : "Enter the patient's basic information"}
+            </p>
           </div>
         </div>
 
@@ -248,25 +291,6 @@ const CreatePatientPage: React.FC = () => {
               />
               {errors.phone && (
                 <span className="form-error">{errors.phone}</span>
-              )}
-            </div>
-
-            {/* National ID */}
-            <div className="form-group">
-              <label className="form-label" htmlFor="national_id">
-                National ID
-              </label>
-              <input
-                id="national_id"
-                name="national_id"
-                type="text"
-                className={`form-input ${errors.national_id ? 'form-input-error' : ''}`}
-                value={formData.national_id}
-                onChange={handleChange}
-                placeholder="e.g. 12345678"
-              />
-              {errors.national_id && (
-                <span className="form-error">{errors.national_id}</span>
               )}
             </div>
           </div>

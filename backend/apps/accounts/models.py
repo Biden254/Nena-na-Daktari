@@ -23,6 +23,16 @@ class User(AbstractUser):
         default=Role.DOCTOR,
     )
 
+    # Doctor <-> Department is many-to-many: a doctor can work in one or
+    # multiple departments, and a department has many doctors.
+    # Managed from Django Admin. Assignment does not gate encounter access.
+    departments = models.ManyToManyField(
+        "departments.Department",
+        blank=True,
+        related_name="doctors",
+        help_text="Departments this doctor works in",
+    )
+
     class Meta:
         db_table = "accounts_user"
         verbose_name = "user"

@@ -5,12 +5,19 @@
 import apiClient from './api';
 import { Encounter, EncounterCreateData, PaginatedResponse } from '../types';
 
+interface EncounterFilters {
+  /** Only encounters for one department. */
+  department?: string;
+  /** The longitudinal history of one patient. */
+  patient?: string;
+}
+
 const encounterService = {
   /**
-   * Get list of encounters.
+   * Get list of encounters, optionally filtered by department or patient.
    */
-  async getEncounters(): Promise<PaginatedResponse<Encounter>> {
-    const response = await apiClient.get('/encounters/');
+  async getEncounters(filters?: EncounterFilters): Promise<PaginatedResponse<Encounter>> {
+    const response = await apiClient.get('/encounters/', { params: filters });
     return response.data;
   },
 

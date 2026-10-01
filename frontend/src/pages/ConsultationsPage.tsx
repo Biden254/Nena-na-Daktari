@@ -13,6 +13,7 @@ import {
   CalendarDays,
   Clock,
   Filter,
+  Building2,
 } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import encounterService from '../services/encounterService';
@@ -175,6 +176,12 @@ const ConsultationsPage: React.FC = () => {
                     {encounter.patient_name}
                   </div>
                   <div className="consultations-card-meta">
+                    {encounter.department_name && (
+                      <span className="dashboard-encounter-date">
+                        <Building2 size={12} />
+                        {encounter.department_name}
+                      </span>
+                    )}
                     <span className="dashboard-encounter-date">
                       <CalendarDays size={12} />
                       {formatDate(encounter.started_at)}

@@ -31,6 +31,11 @@ class Encounter(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="encounters",
     )
+    department = models.ForeignKey(
+        "departments.Department",
+        on_delete=models.PROTECT,
+        related_name="encounters",
+    )
 
     # Status
     status = models.CharField(

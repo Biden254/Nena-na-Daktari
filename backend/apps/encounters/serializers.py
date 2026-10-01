@@ -13,7 +13,9 @@ class EncounterSerializer(serializers.ModelSerializer):
     """Serializer for Encounter model - full details."""
 
     patient_name = serializers.SerializerMethodField()
+    patient_uhi = serializers.CharField(source="patient.uhi", read_only=True)
     doctor_name = serializers.SerializerMethodField()
+    department_name = serializers.CharField(source="department.name", read_only=True)
 
     class Meta:
         model = Encounter
@@ -21,8 +23,11 @@ class EncounterSerializer(serializers.ModelSerializer):
             "id",
             "patient",
             "patient_name",
+            "patient_uhi",
             "doctor",
             "doctor_name",
+            "department",
+            "department_name",
             "status",
             "started_at",
             "ended_at",
@@ -40,20 +45,18 @@ class EncounterSerializer(serializers.ModelSerializer):
 
 
 class EncounterCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating an encounter."""
+    """
+    Serializer for creating an encounter.
+
+    `doctor` is deliberately not an accepted field: it is always derived
+    from the authenticated user, so a client cannot impersonate another doctor.
+    """
 
     class Meta:
         model = Encounter
-        fields = ["patient", "notes"]
-
-    def validate_patient(self, value):
-        """Ensure the patient belongs to the current user."""
-        user = self.context["request"].user
-        if value.created_by != user:
-            raise serializers.ValidationError(
-                "You can only create encounters for your own patients."
-            )
-        return value
+        # Every encounter references a patient and a department
+        # (Patient -> Encounter -> Department).
+        fields = ["patient", "department", "notes"]
 
     def create(self, validated_data):
         """Set the doctor to the current user."""
@@ -65,6 +68,9 @@ class EncounterListSerializer(serializers.ModelSerializer):
     """Lightweight serializer for encounter lists."""
 
     patient_name = serializers.SerializerMethodField()
+    patient_uhi = serializers.CharField(source="patient.uhi", read_only=True)
+    doctor_name = serializers.SerializerMethodField()
+    department_name = serializers.CharField(source="department.name", read_only=True)
 
     class Meta:
         model = Encounter
@@ -72,6 +78,11 @@ class EncounterListSerializer(serializers.ModelSerializer):
             "id",
             "patient",
             "patient_name",
+            "patient_uhi",
+            "doctor",
+            "doctor_name",
+            "department",
+            "department_name",
             "status",
             "started_at",
             "ended_at",
@@ -79,3 +90,6 @@ class EncounterListSerializer(serializers.ModelSerializer):
 
     def get_patient_name(self, obj):
         return obj.patient.full_name
+
+    def get_doctor_name(self, obj):
+        return obj.doctor.get_full_name() or obj.doctor.username

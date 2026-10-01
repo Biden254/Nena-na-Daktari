@@ -35,6 +35,69 @@
   margin-bottom: var(--space-1);
 }
 
+.patient-detail-name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-1);
+}
+
+.patient-detail-name-row .patient-detail-name {
+  margin-bottom: 0;
+}
+
+/* System-generated Unique Hospital Identifier */
+.patient-detail-uhi {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary-muted);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* ===== Start consultation panel ===== */
+.start-consult-panel {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.start-consult-panel .form-group {
+  flex: 1;
+  max-width: 320px;
+  margin-bottom: 0;
+}
+
+.start-consult-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+@media (max-width: 640px) {
+  .start-consult-panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .start-consult-panel .form-group {
+    max-width: none;
+  }
+
+  .start-consult-actions {
+    justify-content: flex-end;
+  }
+}
+
 .patient-detail-meta {
   display: flex;
   flex-wrap: wrap;

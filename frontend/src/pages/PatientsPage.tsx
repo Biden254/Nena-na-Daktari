@@ -91,10 +91,10 @@ const PatientsPage: React.FC = () => {
           <input
             type="text"
             className="form-input"
-            placeholder="Search by name, national ID, or phone..."
+            placeholder="Search by name, UHI, or phone..."
             value={searchQuery}
             onChange={(e) => handleSearchChange(e.target.value)}
-            aria-label="Search patients"
+            aria-label="Search patients by name, UHI, or phone"
           />
         </div>
 
@@ -143,7 +143,7 @@ const PatientsPage: React.FC = () => {
                       <span className="patients-card-meta">
                         {patient.gender === 'M' ? 'Male' : patient.gender === 'F' ? 'Female' : 'Other'}
                         {patient.date_of_birth && ` · DOB: ${formatDate(patient.date_of_birth)}`}
-                        {patient.national_id && ` · ID: ${patient.national_id}`}
+                        {patient.uhi && ` · UHI ${patient.uhi}`}
                       </span>
                     </div>
                   </div>

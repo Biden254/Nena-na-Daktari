@@ -15,6 +15,7 @@ import {
   Stethoscope,
   Square,
   FileText,
+  Building2,
 } from 'lucide-react';
 import AppShell from '../components/AppShell';
 import encounterService from '../services/encounterService';
@@ -188,6 +189,16 @@ const EncounterPage: React.FC = () => {
               >
                 {encounter.patient_name}
               </button>
+            </div>
+
+            <div className="encounter-sidebar-section">
+              <div className="encounter-sidebar-label">
+                <Building2 size={14} />
+                Department
+              </div>
+              <span className="encounter-sidebar-value">
+                {encounter.department_name || '—'}
+              </span>
             </div>
 
             <div className="encounter-sidebar-section">

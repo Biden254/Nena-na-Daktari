@@ -8,6 +8,7 @@ import authService from './services/authService';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import DepartmentPage from './pages/DepartmentPage';
 import PatientsPage from './pages/PatientsPage';
 import CreatePatientPage from './pages/CreatePatientPage';
 import PatientDetailPage from './pages/PatientDetailPage';
@@ -42,6 +43,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/departments/:id"
+            element={
+              <ProtectedRoute>
+                <DepartmentPage />
               </ProtectedRoute>
             }
           />
